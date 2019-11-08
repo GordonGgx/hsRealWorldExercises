@@ -77,4 +77,62 @@ myContact (x:xs)=x++myContact xs
 myContact_Fold::[[a]]->[a]
 myContact_Fold=foldl' (++) [] 
 
+myTakeWhile _ []=[]
+myTakeWhile f (x:xs)
+        | f x=x:myTakeWhile f xs
+        |otherwise =[]
 
+{--
+foldl表示向左遍历即从右向左折叠
+Foldable t =>
+(b -> a -> b) -> b -> t a -> b
+--}
+myTakeWhileFoldl f =foldl step []
+    where step xs x| f x=x:xs
+                     |otherwise =[]
+{--foldr表示向右遍历即从左向右折叠
+Foldable t =>
+(a -> b -> b) -> b -> t a -> b
+--}
+myTakeWhileFoldr f =foldr step []
+    where step x xs | f x=x:xs
+                     |otherwise =[]
+
+
+myGroupBy :: (a -> a -> Bool) -> [a] -> [[a]]
+myGroupBy _ []=[]
+myGroupBy f (x:y:xs) 
+            | f x y=[x,y]:myGroupBy f xs
+            |otherwise=[x]:[y]:myGroupBy f xs
+
+
+myGroupByFold :: (a -> a -> Bool) -> [a] -> [[a]]
+myGroupByFold _ []=[]
+myGroupByFold fn (x : xs) = foldl step [[x]] xs
+                    where   step acc x' = if all (\gx -> fn x' gx) lastGroup
+                                        then previousGroups ++ [lastGroup ++ [x']]
+                                        else acc ++ [[x']]
+                                            where
+                                                lastGroup = last acc
+                                                previousGroups = init acc
+
+myAny _ []=False
+myAny fn (x:xs)=let is=fn x
+                in is || myAny fn xs
+
+myAnyFold _ []=False
+myAnyFold f (x:xs)=foldr step (f x) xs
+                where step x' acc=acc || f x'
+            
+myWords []=[]
+myWords xs=let xs'=dropWhile isSpace xs
+               (pre,suf)=break isSpace xs'
+           in pre:myWords suf
+
+myWordsFold []=[]
+myWordsFold xs=foldl step [[]] xs
+                where step acc x
+                            |isSpace x=acc++[[]]
+                            |otherwise =pre++[lastGroup++[x]]
+                            where pre =init acc
+                                  lastGroup=last acc
