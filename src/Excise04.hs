@@ -131,9 +131,11 @@ myWords xs=case dropWhile isSpace xs of
                         where (w,s')=break isSpace str
 
 myWordsFold::String->[String]
-myWordsFold xs= case dropWhile isSpace xs of
-                    ""->[]
-                    str->w:myWordsFold s'
-                        where (w,s')=break isSpace str
-aa=words
+myWordsFold []=[]
+myWordsFold (x:xs)= foldl step [[x]] xs
+            where step acc x'=if all isSpace lastStr
+                              then acc ++[[x']]
+                              else initStr++[lastStr++[x']]
+                              where lastStr=last acc
+                                    initStr=init acc
 
