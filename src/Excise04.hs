@@ -125,14 +125,15 @@ myAnyFold f (x:xs)=foldr step (f x) xs
                 where step x' acc=acc || f x'
             
 myWords []=[]
-myWords xs=let xs'=dropWhile isSpace xs
-               (pre,suf)=break isSpace xs'
-           in pre:myWords suf
+myWords xs=case dropWhile isSpace xs of
+                    ""->[]
+                    str->w:myWordsFold s'
+                        where (w,s')=break isSpace str
 
-myWordsFold []=[]
-myWordsFold xs=foldl step [[]] xs
-                where step acc x
-                            |isSpace x=acc++[[]]
-                            |otherwise =pre++[lastGroup++[x]]
-                            where pre =init acc
-                                  lastGroup=last acc
+myWordsFold::String->[String]
+myWordsFold xs= case dropWhile isSpace xs of
+                    ""->[]
+                    str->w:myWordsFold s'
+                        where (w,s')=break isSpace str
+aa=words
+
