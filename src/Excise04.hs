@@ -144,3 +144,7 @@ myWordsFold xs= let
                                                           initStr = init acc
                                                           space x''=if isSpace x'' then acc++[[x'']] else initStr++[lastStr++[x'']]                  
 
+myUnlinesFold::[String]->String
+myUnlinesFold []=[]
+myUnlinesFold (x:lines)=foldl step x lines
+                where step acc line'=acc++"\n"++line'
