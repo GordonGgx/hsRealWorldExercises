@@ -6,7 +6,7 @@ import Data.List
 -- 分割换行符兼容windows和unix
 splitLines cs=
     let (pre,suf)=break (\c->c=='\r'||c=='\n') cs
-    in pre:case suf of 
+    in pre:case suf of
                 '\r':'\n':xs->splitLines xs
                 '\n':xs->splitLines xs
                 '\r':xs->splitLines xs
@@ -16,11 +16,11 @@ splitLines cs=
 fixLines xs=unlines $ splitLines xs
 
 safeHead :: [a]->Maybe a
-safeHead []=Nothing 
+safeHead []=Nothing
 safeHead (x:_)=Just x
 
 safeTail :: [a] -> Maybe [a]
-safeTail [] =Nothing 
+safeTail [] =Nothing
 safeTail  (_:xs)=Just xs
 
 safeLast :: [a] -> Maybe a
@@ -29,19 +29,19 @@ safeLast [x] =Just x
 safeLast (_:xs)= safeLast xs
 
 safeInit :: [a] -> Maybe [a]
-safeInit [] =Nothing 
+safeInit [] =Nothing
 safeInit xs=Just (getHead xs)
         where getHead [x]=[]
-              getHead (x:cs)=x:getHead cs 
+              getHead (x:cs)=x:getHead cs
 
 myWorlds::String->[String]
-myWorlds s =case dropWhile isSpace s of 
+myWorlds s =case dropWhile isSpace s of
                 ""->[]
                 s'->w:myWorlds s''
                     where (w,s'')=break isSpace s'
 
 splitWith ::(a->Bool)->[a]->[[a]]
-splitWith fun s=case dropWhile fun s of 
+splitWith fun s=case dropWhile fun s of
                     []->[]
                     s'->w:splitWith fun s''
                         where (w,s'')=break fun s'
@@ -75,7 +75,7 @@ myContact []=[]
 myContact (x:xs)=x++myContact xs
 
 myContact_Fold::[[a]]->[a]
-myContact_Fold=foldl' (++) [] 
+myContact_Fold=foldl' (++) []
 
 myTakeWhile _ []=[]
 myTakeWhile f (x:xs)
@@ -83,14 +83,14 @@ myTakeWhile f (x:xs)
         |otherwise =[]
 
 {--
-foldl表示向左遍历即从右向左折叠
+foldl表示向左遍历从左到右
 Foldable t =>
 (b -> a -> b) -> b -> t a -> b
 --}
 myTakeWhileFoldl f =foldl step []
     where step xs x| f x=x:xs
                      |otherwise =[]
-{--foldr表示向右遍历即从左向右折叠
+{--foldr表示向右遍历从右向左
 Foldable t =>
 (a -> b -> b) -> b -> t a -> b
 --}
@@ -101,7 +101,7 @@ myTakeWhileFoldr f =foldr step []
 
 myGroupBy :: (a -> a -> Bool) -> [a] -> [[a]]
 myGroupBy _ []=[]
-myGroupBy f (x:y:xs) 
+myGroupBy f (x:y:xs)
             | f x y=[x,y]:myGroupBy f xs
             |otherwise=[x]:[y]:myGroupBy f xs
 
@@ -123,7 +123,7 @@ myAny fn (x:xs)=let is=fn x
 myAnyFold _ []=False
 myAnyFold f (x:xs)=foldr step (f x) xs
                 where step x' acc=acc || f x'
-            
+
 myWords []=[]
 myWords xs=case dropWhile isSpace xs of
                     ""->[]
@@ -132,10 +132,15 @@ myWords xs=case dropWhile isSpace xs of
 
 myWordsFold::String->[String]
 myWordsFold []=[]
-myWordsFold (x:xs)= foldl step [[x]] xs
-            where step acc x'=if all isSpace lastStr
-                              then acc ++[[x']]
-                              else initStr++[lastStr++[x']]
-                              where lastStr=last acc
-                                    initStr=init acc
+myWordsFold xs= let
+                    xs'=splitSpace $ dropWhile isSpace xs
+                in  if all isSpace $ last xs' then init xs' else xs'
+                where  splitSpace []=[]
+                       splitSpace (x:xs'')=foldl step [[x]] xs''
+                                            where step acc x'
+                                                    | all isSpace lastStr =initStr++[[x']]
+                                                    | otherwise = space x'
+                                                    where lastStr = last acc
+                                                          initStr = init acc
+                                                          space x''=if isSpace x'' then acc++[[x'']] else initStr++[lastStr++[x'']]                  
 
