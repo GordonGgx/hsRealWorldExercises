@@ -1,4 +1,4 @@
-module Excise05 where
+module SimpleJSON(JValue(..)) where
 
 import Data.List
 
