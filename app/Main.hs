@@ -1,6 +1,5 @@
 module Main where
 
-import Excise04
 import System.Environment
 
 interactWith function inputFile outputFile=do
